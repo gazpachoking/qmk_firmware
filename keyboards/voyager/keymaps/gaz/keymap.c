@@ -132,6 +132,10 @@ bool rgb_matrix_indicators_user(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  // If console is enabled, it will print the matrix position and status of each key pressed
+#ifdef CONSOLE_ENABLE
+  uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+#endif 
   if (!process_achordion(keycode, record)) { return false; }
   switch (keycode) {
     case ST_MACRO_0:
@@ -181,36 +185,22 @@ bool achordion_chord(uint16_t tap_hold_keycode,
                      keyrecord_t* tap_hold_record,
                      uint16_t other_keycode,
                      keyrecord_t* other_record) {
-  // Exceptionally consider the following chords as holds, even though they
-  // are on the same hand in Dvorak.
-  // switch (tap_hold_keycode) {
-	  // case LT(3,KC_ESCAPE):
-	  // case LT(4,KC_GRAVE):
-		// return true;
-    // case HOME_A:  // A + U.
-      // if (other_keycode == HOME_U) { return true; }
-      // break;
-
-    // case HOME_S:  // S + H and S + G.
-      // if (other_keycode == HOME_H || other_keycode == KC_G) { return true; }
-      // break;
-  // }
-
-  // Allow same hand layer switches from the thumb clusters
-  // I need the `% (MATRIX_ROWS / 2)` because my keyboard is split.
-  //if (tap_hold_record->event.key.row % (MATRIX_ROWS / 2) >= 5) { return true; }
-  // Also allow same-hand mod holds to apply to the left thumb cluster (e.g. alt-tab)
+  // Allow same hand holds with the left column and left thumb cluster
+  // whethere they are the hold or tap key
+  //left thumb cluster
   if (other_record->event.key.row == 5) { return true; }
-  if (other_record->event.key.col == 0) { return true; }
-  if (tap_hold_record->event.key.col == 5) { return true; }
-  if (tap_hold_record->event.key.col == 0) { return true; }
+  //first column on left half
+  if (other_record->event.key.col == 1 && other_record->event.key.row < 4) { return true; }
+  if (tap_hold_record->event.key.row == 5) { return true; }
+  if (tap_hold_record->event.key.col == 1 && tap_hold_record->event.key.row < 4) { return true; }
 
   // Otherwise, follow the opposite hands rule.
   return achordion_opposite_hands(tap_hold_record, other_record);
 }
 
 bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
+  // If thumb cluster or left column initiate a multi key press, it's definitely a hold
   if (record->event.key.row == 5) { return true; }
-  if (record->event.key.col == 0) { return true; }
+  if (record->event.key.col == 1 && record->event.key.row < 4) { return true; }
   return false;
 }
