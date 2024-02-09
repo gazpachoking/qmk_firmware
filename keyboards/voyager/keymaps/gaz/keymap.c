@@ -180,13 +180,13 @@ uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
 bool achordion_chord(uint16_t tap_hold_keycode,
                      keyrecord_t* tap_hold_record,
                      uint16_t other_keycode,
-                     keyrecord_t* other_recordvz vz vz vz vz {
+                     keyrecord_t* other_record) {
   // Exceptionally consider the following chords as holds, even though they
   // are on the same hand in Dvorak.
-  switch (tap_hold_keycode) {
-	  case LT(3,KC_ESCAPE):
-	  case LT(4,KC_GRAVE):
-		return true;
+  // switch (tap_hold_keycode) {
+	  // case LT(3,KC_ESCAPE):
+	  // case LT(4,KC_GRAVE):
+		// return true;
     // case HOME_A:  // A + U.
       // if (other_keycode == HOME_U) { return true; }
       // break;
@@ -194,14 +194,23 @@ bool achordion_chord(uint16_t tap_hold_keycode,
     // case HOME_S:  // S + H and S + G.
       // if (other_keycode == HOME_H || other_keycode == KC_G) { return true; }
       // break;
-  }
+  // }
 
   // Allow same hand layer switches from the thumb clusters
   // I need the `% (MATRIX_ROWS / 2)` because my keyboard is split.
-  if (tap_hold_record->event.key.row % (MATRIX_ROWS / 2) >= 5) { return true; }
+  //if (tap_hold_record->event.key.row % (MATRIX_ROWS / 2) >= 5) { return true; }
   // Also allow same-hand mod holds to apply to the left thumb cluster (e.g. alt-tab)
   if (other_record->event.key.row == 5) { return true; }
+  if (other_record->event.key.col == 0) { return true; }
+  if (tap_hold_record->event.key.col == 5) { return true; }
+  if (tap_hold_record->event.key.col == 0) { return true; }
 
   // Otherwise, follow the opposite hands rule.
   return achordion_opposite_hands(tap_hold_record, other_record);
+}
+
+bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
+  if (record->event.key.row == 5) { return true; }
+  if (record->event.key.col == 0) { return true; }
+  return false;
 }
