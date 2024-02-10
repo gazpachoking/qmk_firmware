@@ -2,6 +2,7 @@
 #include "version.h"
 #include "i18n.h"
 #include "features/achordion.h"
+#include "features/custom_shift_keys.h"
 #define MOON_LED_LEVEL LED_LEVEL
 
 enum custom_keycodes {
@@ -11,14 +12,22 @@ enum custom_keycodes {
   ST_MACRO_2,
 };
 
-
+const custom_shift_key_t custom_shift_keys[] = {
+  // {KC_DOT , KC_QUES}, // Shift . is ?
+  // {KC_COMM, KC_EXLM}, // Shift , is !
+  // {KC_MINS, KC_EQL }, // Shift - is =
+  {KC_EQUAL, KC_EXLM}, // Shift = is !
+  {KC_COLN, KC_SCLN}, // Shift : is ; 
+};
+uint8_t NUM_CUSTOM_SHIFT_KEYS =
+    sizeof(custom_shift_keys) / sizeof(custom_shift_key_t);
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_voyager(
     LT(4,KC_GRAVE), KC_1,           KC_2,           KC_3,           KC_4,           KC_5,                                           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           KC_BSLS,        
     KC_EQUAL,       KC_QUOTE,       KC_COMMA,       KC_DOT,         KC_P,           KC_Y,                                           KC_F,           KC_G,           KC_C,           KC_R,           KC_L,           KC_SLASH,       
     LT(3,KC_ESCAPE),MT(MOD_LGUI, KC_A),MT(MOD_LALT, KC_O),MT(MOD_LCTL, KC_E),MT(MOD_LSFT, KC_U),KC_I,                                           KC_D,           MT(MOD_RSFT, KC_H),MT(MOD_RCTL, KC_T),MT(MOD_RALT, KC_N),MT(MOD_RGUI, KC_S),KC_MINUS,       
-    CW_TOGG,        KC_SCLN,        KC_Q,           KC_J,           KC_K,           KC_X,                                           KC_B,           KC_M,           KC_W,           KC_V,           KC_Z,           KC_PSCR,        
+    CW_TOGG,        KC_COLN,        KC_Q,           KC_J,           KC_K,           KC_X,                                           KC_B,           KC_M,           KC_W,           KC_V,           KC_Z,           KC_PSCR,        
                                                     LT(1,KC_ENTER), LT(2,KC_TAB),                                   KC_BSPC,        KC_SPACE
   ),
   [1] = LAYOUT_voyager(
@@ -79,11 +88,9 @@ combo_t key_combos[COMBO_COUNT] = {
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case MT(MOD_LSFT, KC_U):
-            return TAPPING_TERM -65;
+            return TAPPING_TERM -40;
         case MT(MOD_RSFT, KC_H):
-            return TAPPING_TERM -65;
-        case MT(MOD_RGUI, KC_SCLN):
-            return TAPPING_TERM -25;
+            return TAPPING_TERM -40;
         default:
             return TAPPING_TERM;
     }
@@ -137,6 +144,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   uprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
 #endif 
   if (!process_achordion(keycode, record)) { return false; }
+  if (!process_custom_shift_keys(keycode, record)) { return false; }
   switch (keycode) {
     case ST_MACRO_0:
     if (record->event.pressed) {
