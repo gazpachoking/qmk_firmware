@@ -22,18 +22,21 @@ const custom_shift_key_t custom_shift_keys[] = {
 uint8_t NUM_CUSTOM_SHIFT_KEYS =
     sizeof(custom_shift_keys) / sizeof(custom_shift_key_t);
 
-
 enum tap_dance_codes {
   DANCE_0,
 };
+
+#define HOME_ESC LT(3,KC_ESCAPE)
+#define THUMB_ENTER LT(1,KC_ENTER)
+#define THUMB_TAB LT(2,KC_TAB)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_voyager(
     LT(4,KC_GRAVE), KC_1,           KC_2,           KC_3,           KC_4,           KC_5,                                           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           TD(DANCE_0),
     KC_EQUAL,       KC_QUOTE,       KC_COMMA,       KC_DOT,         KC_P,           KC_Y,                                           KC_F,           KC_G,           KC_C,           KC_R,           KC_L,           KC_SLASH,
-    LT(3,KC_ESCAPE),MT(MOD_LGUI, KC_A),MT(MOD_LALT, KC_O),MT(MOD_LCTL, KC_E),MT(MOD_LSFT, KC_U),KC_I,                                           KC_D,           MT(MOD_RSFT, KC_H),MT(MOD_RCTL, KC_T),MT(MOD_RALT, KC_N),MT(MOD_RGUI, KC_S),KC_MINUS,
+    HOME_ESC,       MT(MOD_LGUI, KC_A),MT(MOD_LALT, KC_O),MT(MOD_LCTL, KC_E),MT(MOD_LSFT, KC_U),KC_I,                               KC_D,           MT(MOD_RSFT, KC_H),MT(MOD_RCTL, KC_T),MT(MOD_RALT, KC_N),MT(MOD_RGUI, KC_S),KC_MINUS,
     CW_TOGG,        KC_COLN,        KC_Q,           KC_J,           KC_K,           KC_X,                                           KC_B,           KC_M,           KC_W,           KC_V,           KC_Z,           KC_UNDS,
-                                                    LT(1,KC_ENTER), LT(2,KC_TAB),                                   KC_BSPC,        KC_SPACE
+                                                    THUMB_ENTER,    THUMB_TAB,                                      KC_BSPC,        KC_SPACE
   ),
   [1] = LAYOUT_voyager(
     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
@@ -189,6 +192,16 @@ void matrix_scan_user(void) {
   achordion_task();
 }
 
+uint16_t achordion_timeout(uint16_t tap_hold_keycode) {
+  switch (tap_hold_keycode) {
+    case THUMB_ENTER:
+    case THUMB_TAB:
+    case HOME_ESC:
+      return 0;  // Bypass Achordion for these keys.
+  }
+  return 800;
+}
+
 uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
   if (IS_QK_LAYER_TAP(tap_hold_keycode)) {
     return 0;  // Disable streak detection on layer-tap keys.
@@ -199,7 +212,7 @@ uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
   if ((mod & MOD_LSFT) != 0) {
     return 50;  // A shorter streak timeout for Shift mod-tap keys.
   } else {
-    return 150;  // A longer timeout otherwise.
+    return 170;  // A longer timeout otherwise.
   }
 }
 
@@ -218,6 +231,18 @@ bool achordion_chord(uint16_t tap_hold_keycode,
 
   // Otherwise, follow the opposite hands rule.
   return achordion_opposite_hands(tap_hold_record, other_record);
+}
+
+bool achordion_eager_mod(uint8_t mod) {
+  switch (mod) {
+    case MOD_LSFT:
+    case MOD_LCTL:
+    case MOD_LALT:
+      return true;  // Eagerly apply left mods for use with mouse.
+
+    default:
+      return false;
+  }
 }
 
 bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
