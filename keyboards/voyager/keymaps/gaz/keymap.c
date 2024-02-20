@@ -10,6 +10,7 @@ enum custom_keycodes {
   ST_MACRO_0,
   ST_MACRO_1,
   ST_MACRO_2,
+  UKC_CAPS_WORD,
 };
 
 const custom_shift_key_t custom_shift_keys[] = {
@@ -89,7 +90,7 @@ const uint16_t PROGMEM combo3[] = { KC_G, MT(MOD_RSFT, KC_H), COMBO_END};
 const uint16_t PROGMEM combo4[] = { KC_C, MT(MOD_RCTL, KC_T), COMBO_END};
 const uint16_t PROGMEM combo5[] = { KC_R, MT(MOD_RALT, KC_N), COMBO_END};
 const uint16_t PROGMEM combo6[] = { KC_L, MT(MOD_RGUI, KC_S), COMBO_END};
-// const uint16_t PROGMEM combo7[] = { MT(MOD_LSFT, KC_U), MT(MOD_RSFT, KC_H), COMBO_END};
+const uint16_t PROGMEM combo7[] = { MT(MOD_LSFT, KC_U), MT(MOD_RSFT, KC_H), COMBO_END};
 
 combo_t key_combos[COMBO_COUNT] = {
     COMBO(combo0, KC_F2),
@@ -99,7 +100,7 @@ combo_t key_combos[COMBO_COUNT] = {
     COMBO(combo4, KC_DOWN),
     COMBO(combo5, KC_UP),
     COMBO(combo6, KC_RIGHT),
-    // COMBO(combo7, CW_TOGG),
+    COMBO(combo7, UKC_CAPS_WORD),
 };
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
@@ -178,6 +179,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       SEND_STRING(SS_LALT(SS_LCTL(SS_TAP(X_2))) SS_DELAY(100) SS_LALT(SS_LCTL(SS_TAP(X_F2))));
     }
     break;
+    case UKC_CAPS_WORD:
+      caps_word_toggle();
+      return true;
 
     case RGB_SLD:
       if (record->event.pressed) {
