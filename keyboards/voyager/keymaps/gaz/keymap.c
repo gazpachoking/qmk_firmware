@@ -36,7 +36,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     LT(4,KC_GRAVE), KC_1,           KC_2,           KC_3,           KC_4,           KC_5,                                           KC_6,           KC_7,           KC_8,           KC_9,           KC_0,           TD(DANCE_0),
     KC_EQUAL,       KC_QUOTE,       KC_COMMA,       KC_DOT,         KC_P,           KC_Y,                                           KC_F,           KC_G,           KC_C,           KC_R,           KC_L,           KC_SLASH,
     HOME_ESC,       MT(MOD_LGUI, KC_A),MT(MOD_LALT, KC_O),MT(MOD_LCTL, KC_E),MT(MOD_LSFT, KC_U),KC_I,                               KC_D,           MT(MOD_RSFT, KC_H),MT(MOD_RCTL, KC_T),MT(MOD_RALT, KC_N),MT(MOD_RGUI, KC_S),KC_MINUS,
-    CW_TOGG,        KC_COLN,        KC_Q,           KC_J,           KC_K,           KC_X,                                           KC_B,           KC_M,           KC_W,           KC_V,           KC_Z,           KC_UNDS,
+    QK_LEAD,        KC_COLN,        KC_Q,           KC_J,           KC_K,           KC_X,                                           KC_B,           KC_M,           KC_W,           KC_V,           KC_Z,           KC_UNDS,
                                                     THUMB_ENTER,    THUMB_TAB,                                      KC_BSPC,        KC_SPACE
   ),
   [1] = LAYOUT_voyager(
@@ -259,3 +259,16 @@ bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
 tap_dance_action_t tap_dance_actions[] = {
         [DANCE_0] = ACTION_TAP_DANCE_DOUBLE(KC_BSLS, KC_PSCR),
 };
+
+void leader_end_user(void) {
+    if (leader_sequence_two_keys(KC_E, KC_H)) {
+        // Leader, e, h => Home email
+        SEND_STRING("chase.sterling@gmail.com");
+    } else if (leader_sequence_two_keys(KC_E, KC_W)) {
+        // Leader, e, w => Work email
+        SEND_STRING("chase.sterling@h5datacenters.com");
+    } else if (leader_sequence_two_keys(KC_E, KC_S)) {
+        // Leader, e, s => Shared email
+        SEND_STRING("chase.and.rachel.sterling@gmail.com");
+    }
+}
