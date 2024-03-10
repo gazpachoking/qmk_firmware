@@ -118,7 +118,7 @@ extern rgb_config_t rgb_matrix_config;
 
 void keyboard_post_init_user(void) {
   rgb_matrix_enable();
-  debug_enable=false;
+  debug_enable=true;
 }
 
 const uint8_t PROGMEM ledmap[][RGB_MATRIX_LED_COUNT][3] = {
@@ -217,7 +217,7 @@ uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
   if ((mod & MOD_MASK_SHIFT) != 0) {
     return 0;  // A shorter streak timeout for Shift mod-tap keys.
   } else {
-    return 180;  // A longer timeout otherwise.
+    return 280;  // A longer timeout otherwise.
   }
 }
 
