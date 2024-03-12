@@ -207,17 +207,20 @@ uint16_t achordion_timeout(uint16_t tap_hold_keycode) {
   return 800;
 }
 
-uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode) {
+uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode, uint16_t next_keycode) {
   if (IS_QK_LAYER_TAP(tap_hold_keycode)) {
     return 0;  // Disable streak detection on layer-tap keys.
   }
+
+  // mod-enter should be allowed in streaks (for alt-enter after web address)
+  if (next_keycode == THUMB_ENTER) return 0;
 
   // Otherwise, tap_hold_keycode is a mod-tap key.
   uint8_t mod = mod_config(QK_MOD_TAP_GET_MODS(tap_hold_keycode));
   if ((mod & MOD_MASK_SHIFT) != 0) {
     return 0;  // A shorter streak timeout for Shift mod-tap keys.
   } else {
-    return 280;  // A longer timeout otherwise.
+    return 180;  // A longer timeout otherwise.
   }
 }
 
