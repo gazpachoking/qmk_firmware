@@ -220,7 +220,7 @@ uint16_t achordion_streak_timeout(uint16_t tap_hold_keycode, uint16_t next_keyco
   if ((mod & MOD_MASK_SHIFT) != 0) {
     return 0;  // A shorter streak timeout for Shift mod-tap keys.
   } else {
-    return 180;  // A longer timeout otherwise.
+    return 330;  // A longer timeout otherwise.
   }
 }
 
